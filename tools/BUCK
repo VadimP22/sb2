@@ -1,0 +1,7 @@
+load(":python_script.bzl", "python_script")
+
+python_script(
+    name = "mk_cdb",
+    file = "make_comp_db.py",
+    visibility = ["PUBLIC"],
+)
