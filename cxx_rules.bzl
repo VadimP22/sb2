@@ -1,4 +1,4 @@
-load(":types.bzl", "CxxLinkable", "CxxToolchain", "CxxConfig", "CdbFiles")
+load(":types.bzl", "CxxLinkable", "CxxToolchain", "CxxConfig", "CdbFiles", "CxxIncludes")
 load(":cxx_utils.bzl", "compile_cxx", "link_cxx", "reexport_linkables", "reexport_cdb_files", "prepare_includes")
 
 
@@ -6,11 +6,10 @@ def cxx_library_impl(ctx: "context") -> ["provider"]:
     new_objs = []
     new_cdbs = []
     
-    deps = []
+    inc_deps = []
     for dep in ctx.attrs.deps:
-        deps.append(dep[CxxLinkable])    
-
-    all_includes = prepare_includes(deps = deps, new_includes = ctx.attrs.includes)
+        inc_deps.append(dep[CxxIncludes])    
+    all_includes = prepare_includes(deps = inc_deps, new_includes = ctx.attrs.includes)
 
     for src in ctx.attrs.sources:
         out = ctx.actions.declare_output(src.basename + ".linkable")
@@ -27,14 +26,21 @@ def cxx_library_impl(ctx: "context") -> ["provider"]:
         new_objs.append(out)
         new_cdbs.append(cdb_out)
 
-    linkables_provider = reexport_linkables(ctx = ctx, new_objs = new_objs,
-        new_includes = ctx.attrs.includes, deps = deps)
 
-    cdb_files_provider = reexport_cdb_files(ctx = ctx, new_cdb_files = new_cdbs)
+    lin_deps = []
+    for dep in ctx.attrs.deps:
+        lin_deps.append(dep[CxxLinkable])    
+    linkables_provider = reexport_linkables(ctx = ctx, new_objs = new_objs, deps = lin_deps)
+
+    cdb_deps = []
+    for dep in ctx.attrs.deps:
+        cdb_deps.append(dep[CdbFiles])
+    cdb_files_provider = reexport_cdb_files(ctx = ctx, new_cdb_files = new_cdbs, deps = cdb_deps)
     
     return [
         cdb_files_provider,
         linkables_provider,
+        CxxIncludes(list = all_includes),
         DefaultInfo(default_output = linkables_provider.objs[0]),
     ]
 

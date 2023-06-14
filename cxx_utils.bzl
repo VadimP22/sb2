@@ -1,4 +1,4 @@
-load(":types.bzl", "CxxLinkable", "CxxToolchain", "CxxConfig", "CdbFiles")
+load(":types.bzl", "CxxLinkable", "CxxToolchain", "CxxConfig", "CdbFiles", "CxxIncludes")
 
 def compile_cxx(
     ctx: "context",
@@ -41,7 +41,7 @@ def compile_cxx(
         "--",
         cxx,
         cxx_args,
-        output
+        output.short_path
     ], category = "gen_cdb", identifier = source.short_path)
 
 
@@ -66,33 +66,30 @@ def link_cxx(
     ], category = "link_cxx", identifier = ctx.attrs.name)
 
 
-def reexport_linkables(ctx: "context", new_objs: ["artifact"], new_includes: ["artifact"], deps: [CxxLinkable.type]) -> "provider":
+def reexport_linkables(ctx: "context", new_objs: ["artifact"], deps: [CxxLinkable.type]) -> "provider":
     all_objs = new_objs
-    all_includes = new_includes
 
     for dep in deps:
         for obj in dep.objs:
             all_objs.append(obj)
 
-        for include in dep.includes:
-            all_includes.append(include)
             
-    return CxxLinkable(objs = all_objs, includes = all_includes)
+    return CxxLinkable(objs = all_objs)
 
 
-def reexport_cdb_files(ctx: "context", new_cdb_files: ["artifact"]) -> "provider":
+def reexport_cdb_files(ctx: "context", new_cdb_files: ["artifact"], deps: [CdbFiles.type]) -> "provider":
     all_cdb_files = new_cdb_files
-    for dep in ctx.attrs.deps:
-        for cdb in dep[CdbFiles].list:
+    for dep in deps:
+        for cdb in dep.list:
             all_cdb_files.append(cdb)
 
     return CdbFiles(list = all_cdb_files)
 
 
-def prepare_includes(deps: [CxxLinkable.type], new_includes: ["artifact"]) -> ["artifact"]:
+def prepare_includes(deps: [CxxIncludes.type], new_includes: ["artifact"]) -> ["artifact"]:
     all_includes = new_includes
     for dep in deps:
-        for inc in dep.includes:
+        for inc in dep.list:
             all_includes.append(inc)
 
     return all_includes

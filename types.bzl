@@ -1,7 +1,10 @@
 # C++
 CxxLinkable = provider(fields = [
     "objs",
-    "includes",
+])
+
+CxxIncludes = provider(fields = [
+    "list",
 ])
 
 CxxToolchain = provider(fields = [
