@@ -1,7 +1,6 @@
 load(":cxx_library.bzl", "cxx_library_impl")
 load(":cxx_executable.bzl", "cxx_executable_impl")
 load(":cxx_cdb.bzl", "cxx_cdb_impl")
-load(":cxx_test.bzl", "cxx_test_impl")
 
 
 cxx_library = rule(impl = cxx_library_impl, attrs = {
