@@ -94,3 +94,8 @@ def prepare_includes(deps: [CxxIncludes.type], new_includes: ["artifact"]) -> ["
 
     return all_includes
 
+
+def run_tests(ctx: "context", tests: [RunInfo.type]):
+    if len(tests) > 0:
+        for test in tests:
+            ctx.actions.run([test], category = "cxx_test")

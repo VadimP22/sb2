@@ -2,7 +2,7 @@ load(":toolchain.bzl", "cxx_config", "cxx_toolchain")
 cxx_config = cxx_config
 cxx_toolchain = cxx_toolchain
 
-load(":cxx_rules.bzl", "cxx_library", "cxx_executable", "cxx_cdb")
+load(":cxx_rules.bzl", "cxx_library", "cxx_executable", "cxx_cdb", "cxx_test")
 cxx_sources = cxx_library
 cxx_executable = cxx_executable
 cxx_compile_commands = cxx_cdb
