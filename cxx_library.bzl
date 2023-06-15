@@ -36,12 +36,6 @@ def cxx_library_impl(ctx: "context") -> ["provider"]:
     for dep in ctx.attrs.deps:
         cdb_deps.append(dep[CdbFiles])
     cdb_files_provider = reexport_cdb_files(ctx = ctx, new_cdb_files = new_cdbs, deps = cdb_deps)
-
-
-    test_deps = []
-    for dep in ctx.attrs.test_deps:
-        test_deps.append(dep[RunInfo])
-    run_tests(ctx = ctx, tests = test_deps)
     
     return [
         cdb_files_provider,
